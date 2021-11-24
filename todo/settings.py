@@ -11,28 +11,21 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 from pathlib import Path
 
+import environ
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
+env = environ.Env()
+# reading .env file
+environ.Env.read_env()
 
-import os
+SECRET_KEY = env("SECRET_KEY")
 
-# SECURITY WARNING: keep the secret key used in production secret!
-keystr = os.environ.get("SECRET_KEY")
+DEBUG = env("DEBUG")
 
-SECRET_KEY = keystr if keystr else "foo"
-
-# SECURITY WARNING: don't run with debug turned on in production!
-envstr = os.environ.get("DEBUG", default=0)
-
-DEBUG = int(envstr) if envstr else 0
-
-envstr = os.environ.get("DJANGO_ALLOWED_HOSTS")
-
-ALLOWED_HOSTS = envstr.split(" ") if envstr else ["0.0.0.0", "localhost", "127.0.0.1"]
+ALLOWED_HOSTS = env("ALLOWED_HOSTS")
 
 
 # Application definition
@@ -90,19 +83,9 @@ WSGI_APPLICATION = "todo.wsgi.application"
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
-    },
-    "db": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": "postgres",
-        "USER": "postgres",
-        "PASSWORD": "postgres",
-        "HOST": "db",
-        "PORT": 5432,
-    },
+    "default": env.db("DATABASE_URL"),
 }
+
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
@@ -142,7 +125,10 @@ USE_TZ = True
 
 STATIC_URL = "/static/"
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
-STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+# STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+STATIC_ROOT = BASE_DIR / "staticfiles"
+
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
